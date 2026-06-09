@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mayank Dhingra — Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #06060c;
+  --cyan: #00e5ff;
+  --purple: #a855f7;
+  --text: #e8e8ed;
+  --text2: #9ca3af;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--text); font-family:'Inter',sans-serif; overflow-x:hidden; -webkit-font-smoothing:antialiased; }
+::-webkit-scrollbar { width:4px; }
+::-webkit-scrollbar-track { background:transparent; }
+::-webkit-scrollbar-thumb { background:rgba(0,229,255,0.15); border-radius:2px; }
+
+/* Fixed 3D canvas behind everything */
+#bg-canvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+
+/* Smooth scroll container */
+#smooth-content { position:fixed; inset:0; overflow:hidden; z-index:1; }
+#smooth-wrapper { will-change:transform; }
+
+/* Sections */
+.section {
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:6rem 2rem; position:relative;
+}
+.section-inner { max-width:900px; width:100%; position:relative; z-index:1; }
+
+/* Glass panels */
+.glass {
+  background:rgba(8,8,22,0.55);
+  border:1px solid rgba(255,255,255,0.06);
+  backdrop-filter:blur(20px);
+  border-radius:20px;
+  padding:2.5rem;
+  transition:all 0.6s;
+}
+.glass:hover { border-color:rgba(0,229,255,0.2); background:rgba(8,8,24,0.7); }
+
+/* Hero */
+.hero { text-align:center; }
+.hero-badge {
+  font-family:'JetBrains Mono',monospace; font-size:0.7rem;
+  color:var(--cyan); letter-spacing:0.15em;
+  margin-bottom:1.5rem; display:flex; align-items:center; justify-content:center; gap:0.5rem;
+}
+.hero-badge .dot {
+  width:7px; height:7px; background:var(--cyan); border-radius:50%;
+  animation:pulse 2s ease-in-out infinite;
+  box-shadow:0 0 10px var(--cyan);
+}
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(1.8)} }
+h1 { font-size:5.5rem; font-weight:900; line-height:1.05; letter-spacing:-0.04em; }
+.gradient-text {
+  background:linear-gradient(135deg,var(--cyan),var(--purple),#ec4899);
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  background-size:200% 200%;
+  animation:gShift 4s ease-in-out infinite;
+}
+@keyframes gShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+.hero-sub { font-size:1.1rem; color:var(--text2); max-width:500px; margin:1.5rem auto 2.5rem; line-height:1.7; }
+.btns { display:flex; gap:1rem; justify-content:center; }
+.btn {
+  padding:0.85rem 1.8rem; border-radius:8px; font-size:0.9rem; font-weight:600;
+  text-decoration:none; transition:all 0.3s;
+}
+.btn-fill { background:linear-gradient(135deg,var(--cyan),var(--purple)); color:#000; }
+.btn-fill:hover { transform:translateY(-2px); box-shadow:0 8px 30px rgba(0,229,255,0.25); }
+.btn-ghost { border:1px solid rgba(255,255,255,0.12); color:var(--text); backdrop-filter:blur(10px); }
+.btn-ghost:hover { border-color:var(--cyan); background:rgba(0,229,255,0.05); }
+
+/* Section label */
+.sec-label {
+  font-family:'JetBrains Mono',monospace; font-size:0.65rem;
+  color:var(--cyan); letter-spacing:0.2em; text-transform:uppercase;
+  padding:0.35rem 0.8rem; border:1px solid rgba(0,229,255,0.15);
+  border-radius:20px; display:inline-block; margin-bottom:1.5rem;
+  position:relative; overflow:hidden;
+}
+.sec-label::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(90deg,transparent,rgba(0,229,255,0.06),transparent);
+  animation:shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer { 0%,100%{transform:translateX(-100%)} 50%{transform:translateX(100%)} }
+
+/* H2 */
+h2 { font-size:2.8rem; font-weight:800; letter-spacing:-0.03em; margin-bottom:1rem; }
+
+/* About grid */
+.about-grid { display:grid; grid-template-columns:1fr 1fr; gap:2rem; align-items:start; }
+.about-text { font-size:1rem; color:var(--text2); line-height:1.8; }
+.about-text strong { color:var(--text); }
+.stats { display:grid; grid-template-columns:1fr 1fr; gap:0.8rem; }
+.stat {
+  background:rgba(8,8,22,0.55); border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px; padding:1.3rem; text-align:center;
+  backdrop-filter:blur(20px); transition:all 0.4s;
+}
+.stat:hover { border-color:rgba(0,229,255,0.2); transform:translateY(-3px); }
+.stat-val { font-family:'Orbitron',sans-serif; font-size:1.8rem; font-weight:800;
+  background:linear-gradient(135deg,var(--cyan),var(--purple));
+  -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+.stat-label { font-size:0.75rem; color:var(--text2); margin-top:0.2rem; }
+
+/* Projects */
+.proj-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:1.2rem; margin-top:2rem; }
+.proj-card { padding:1.6rem; cursor:pointer; }
+.proj-icon { font-size:2rem; margin-bottom:0.8rem; }
+.proj-card h3 { font-size:1.1rem; font-weight:700; margin-bottom:0.5rem; }
+.proj-card p { font-size:0.82rem; color:var(--text2); line-height:1.6; margin-bottom:0.8rem; }
+.tags { display:flex; flex-wrap:wrap; gap:0.35rem; }
+.tag {
+  font-size:0.65rem; padding:0.2rem 0.5rem; border-radius:4px;
+  font-family:'JetBrains Mono',monospace;
+  background:rgba(0,229,255,0.06); color:var(--cyan);
+  border:1px solid rgba(0,229,255,0.1);
+}
+
+/* Skills */
+.skills-grid { display:grid; grid-template-columns:1fr 1fr; gap:1.2rem; margin-top:2rem; }
+.skill-cat { padding:1.6rem; }
+.skill-cat h3 { font-size:1rem; font-weight:700; margin-bottom:1rem; }
+.skill-bar { margin-bottom:0.7rem; }
+.skill-info { display:flex; justify-content:space-between; margin-bottom:0.25rem; font-size:0.78rem; }
+.skill-name { color:var(--text2); }
+.skill-pct { font-family:'JetBrains Mono',monospace; color:var(--cyan); font-size:0.7rem; }
+.skill-track { height:3px; background:rgba(255,255,255,0.04); border-radius:2px; overflow:hidden; }
+.skill-fill { height:100%; border-radius:2px; transition:width 1.2s cubic-bezier(0.22,1,0.36,1); }
+.sf-cyan { background:linear-gradient(90deg,var(--cyan),#00b8d4); }
+.sf-purple { background:linear-gradient(90deg,var(--purple),#7c3aed); }
+.sf-green { background:linear-gradient(90deg,#22c55e,#16a34a); }
+.sf-amber { background:linear-gradient(90deg,#f59e0b,#d97706); }
+.sf-pink { background:linear-gradient(90deg,#ec4899,#db2777); }
+
+/* Contact */
+.contact-card { text-align:center; max-width:550px; margin:0 auto; padding:2.5rem; }
+.contact-card h2 { font-size:2rem; margin-bottom:0.5rem; }
+.contact-card > p { color:var(--text2); line-height:1.7; margin-bottom:1.5rem; font-size:0.95rem; }
+.contact-links { display:flex; justify-content:center; gap:1rem; flex-wrap:wrap; }
+.clink {
+  display:flex; align-items:center; gap:0.5rem; padding:0.7rem 1.3rem;
+  border:1px solid rgba(255,255,255,0.08); border-radius:10px;
+  color:var(--text); text-decoration:none; font-weight:500; font-size:0.85rem;
+  backdrop-filter:blur(10px); transition:all 0.3s;
+}
+.clink:hover { border-color:var(--cyan); background:rgba(0,229,255,0.05); transform:translateY(-2px); }
+.clink span { font-size:1.1rem; }
+
+footer { text-align:center; padding:2rem; color:var(--text2); font-size:0.75rem; border-top:1px solid rgba(255,255,255,0.03); }
+
+/* Reveal classes for JS */
+.reveal { opacity:0; transform:translateY(30px); transition:opacity 0.7s ease, transform 0.7s cubic-bezier(0.22,1,0.36,1); }
+.reveal.visible { opacity:1; transform:translateY(0); }
+
+/* Hide cursor on body only, show via JS custom */
+.cursor, .cursor-dot { position:fixed; pointer-events:none; z-index:9999; }
+.cursor { width:16px; height:16px; border:2px solid var(--cyan); border-radius:50%; mix-blend-mode:difference; transition:width 0.3s,height 0.3s; }
+.cursor-dot { width:4px; height:4px; background:var(--cyan); border-radius:50%; }
+.cursor.hover { width:45px; height:45px; border-color:var(--purple); }
+
+/* Scanlines */
+.scanlines { position:fixed; inset:0; z-index:2; pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.02) 2px,rgba(0,0,0,0.02) 4px); opacity:0.5; }
+
+/* Scroll indicator */
+.scroll-hint {
+  position:absolute; bottom:2rem; left:50%; transform:translateX(-50%);
+  display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+  font-family:'JetBrains Mono',monospace; font-size:0.6rem; color:var(--text2);
+  letter-spacing:0.1em; animation:bob 2s ease-in-out infinite;
+}
+@keyframes bob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(8px)} }
+
+@media(max-width:900px){
+  h1{font-size:3rem} h2{font-size:2rem}
+  .about-grid{grid-template-columns:1fr}
+  .proj-grid{grid-template-columns:1fr 1fr}
+  .skills-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  h1{font-size:2.2rem}
+  .proj-grid{grid-template-columns:1fr}
+  .section{padding:4rem 1rem}
+  .btns{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="scanlines"></div>
+
+<canvas id="bg-canvas"></canvas>
+
+<div id="smooth-content">
+  <div id="smooth-wrapper">
+
+    <!-- HERO -->
+    <section class="section hero" data-scene="hero">
+      <div class="section-inner">
+        <div class="hero-badge reveal"><span class="dot"></span> BCA Student & Developer</div>
+        <h1 class="reveal" style="transition-delay:0.1s">Hey, I'm<br><span class="gradient-text">Mayank Dhingra</span></h1>
+        <p class="hero-sub reveal" style="transition-delay:0.2s">BCA student at UPES Dehradun building real software with Java, Python, Flask, and web technologies. Project-driven, security-minded, and hungry to learn.</p>
+        <div class="btns reveal" style="transition-delay:0.3s">
+          <a href="#projects" class="btn btn-fill" data-scroll-to="projects">My Work</a>
+          <a href="#contact" class="btn btn-ghost" data-scroll-to="contact">Get In Touch</a>
+        </div>
+      </div>
+      <div class="scroll-hint">SCROLL</div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" data-scene="about" id="about">
+      <div class="section-inner">
+        <span class="sec-label reveal">About</span>
+        <div class="about-grid">
+          <div class="about-text reveal" style="transition-delay:0.1s">
+            <p style="margin-bottom:1rem">I'm a <strong>BCA student at UPES Dehradun</strong> with a hands-on, project-driven approach to software development. I build things — from <strong>AI agents and Flask APIs</strong> to <strong>Java desktop applications</strong> with MySQL backends.</p>
+            <p>Certified in <strong>Computer & Network Security</strong> by NIT Kurukshetra. I'm looking for internship opportunities where I can contribute to real projects, learn from experienced engineers, and grow as a developer.</p>
+          </div>
+          <div class="stats">
+            <div class="stat reveal" style="transition-delay:0.2s"><div class="stat-val">BCA</div><div class="stat-label">UPES Dehradun</div></div>
+            <div class="stat reveal" style="transition-delay:0.2s"><div class="stat-val">6+</div><div class="stat-label">Projects</div></div>
+            <div class="stat reveal" style="transition-delay:0.3s"><div class="stat-val">NIT</div><div class="stat-label">CyberSec Certified</div></div>
+            <div class="stat reveal" style="transition-delay:0.3s"><div class="stat-val">SWE</div><div class="stat-label">Seeking Internship</div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="section" data-scene="projects" id="projects">
+      <div class="section-inner">
+        <span class="sec-label reveal">Projects</span>
+        <h2 class="reveal" style="transition-delay:0.1s">What I've Built</h2>
+        <p class="reveal" style="color:var(--text2);max-width:500px;line-height:1.7;margin-bottom:1rem;transition-delay:0.15s">From AI agents to desktop apps — projects across Python, Java, web dev, and data science.</p>
+        <div class="proj-grid">
+
+          <div class="glass proj-card reveal" style="transition-delay:0.1s">
+            <div class="proj-icon">🤖</div>
+            <h3>Monty AI Agent</h3>
+            <p>Voice + text AI assistant powered by GPT-4o with web search, task manager, smart home control, Flask REST API, and an iPhone web app.</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">Flask</span><span class="tag">OpenAI</span><span class="tag">TTS/STT</span></div>
+          </div>
+
+          <div class="glass proj-card reveal" style="transition-delay:0.2s">
+            <div class="proj-icon">📅</div>
+            <h3>Local Event Tracker</h3>
+            <p>Java Swing desktop app for tracking Indian events & festivals — themed UI with animated buttons, MySQL database, search, and CRUD via JDBC.</p>
+            <div class="tags"><span class="tag">Java</span><span class="tag">Swing</span><span class="tag">MySQL</span><span class="tag">JDBC</span></div>
+          </div>
+
+          <div class="glass proj-card reveal" style="transition-delay:0.3s">
+            <div class="proj-icon">✅</div>
+            <h3>TaskFlow Pro</h3>
+            <p>Task management web app with a sleek dark UI — priority levels, due dates, and status tracking built with vanilla HTML, CSS, and JavaScript.</p>
+            <div class="tags"><span class="tag">HTML</span><span class="tag">CSS</span><span class="tag">JavaScript</span></div>
+          </div>
+
+          <div class="glass proj-card reveal" style="transition-delay:0.15s">
+            <div class="proj-icon">📄</div>
+            <h3>OOP Study Guide Generator</h3>
+            <p>Node.js script that generates a formatted DOCX study guide for OOP with Java — tables, code blocks, tips, and professional styling — all programmatic.</p>
+            <div class="tags"><span class="tag">Node.js</span><span class="tag">docx</span><span class="tag">Automation</span></div>
+          </div>
+
+          <div class="glass proj-card reveal" style="transition-delay:0.25s">
+            <div class="proj-icon">📊</div>
+            <h3>Data Science Worksheets</h3>
+            <p>8 hands-on data science worksheets covering statistical analysis, data visualization, and manipulation using R Studio — project-based learning.</p>
+            <div class="tags"><span class="tag">R Studio</span><span class="tag">Statistics</span><span class="tag">Data Viz</span></div>
+          </div>
+
+          <div class="glass proj-card reveal" style="transition-delay:0.35s">
+            <div class="proj-icon">🐍</div>
+            <h3>Python Projects</h3>
+            <p>Collection of Python scripts and tools on GitHub — exploring core concepts, automation patterns, and efficient coding practices.</p>
+            <div class="tags"><span class="tag">Python</span><span class="tag">Scripting</span><span class="tag">GitHub</span></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section" data-scene="skills" id="skills">
+      <div class="section-inner">
+        <span class="sec-label reveal">Skills</span>
+        <h2 class="reveal" style="transition-delay:0.1s">Tech Stack</h2>
+        <p class="reveal" style="color:var(--text2);max-width:500px;line-height:1.7;margin-bottom:1rem;transition-delay:0.15s">Tools & technologies I use to bring ideas to life.</p>
+        <div class="skills-grid">
+
+          <div class="glass skill-cat reveal" style="transition-delay:0.1s">
+            <h3>Languages</h3>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Java</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill sf-cyan" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Python</span><span class="skill-pct">80%</span></div><div class="skill-track"><div class="skill-fill sf-purple" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">C</span><span class="skill-pct">70%</span></div><div class="skill-track"><div class="skill-fill sf-green" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">SQL</span><span class="skill-pct">78%</span></div><div class="skill-track"><div class="skill-fill sf-amber" style="width:0%"></div></div></div>
+          </div>
+
+          <div class="glass skill-cat reveal" style="transition-delay:0.2s">
+            <h3>Web & APIs</h3>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">HTML / CSS</span><span class="skill-pct">85%</span></div><div class="skill-track"><div class="skill-fill sf-cyan" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">JavaScript / Node.js</span><span class="skill-pct">72%</span></div><div class="skill-track"><div class="skill-fill sf-purple" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Flask / APIs</span><span class="skill-pct">68%</span></div><div class="skill-track"><div class="skill-fill sf-pink" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">MySQL / DB</span><span class="skill-pct">78%</span></div><div class="skill-track"><div class="skill-fill sf-green" style="width:0%"></div></div></div>
+          </div>
+
+          <div class="glass skill-cat reveal" style="transition-delay:0.15s">
+            <h3>Data & Analytics</h3>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Data Science</span><span class="skill-pct">68%</span></div><div class="skill-track"><div class="skill-fill sf-purple" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">R Studio</span><span class="skill-pct">60%</span></div><div class="skill-track"><div class="skill-fill sf-cyan" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Data Visualization</span><span class="skill-pct">65%</span></div><div class="skill-track"><div class="skill-fill sf-green" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Statistical Analysis</span><span class="skill-pct">60%</span></div><div class="skill-track"><div class="skill-fill sf-amber" style="width:0%"></div></div></div>
+          </div>
+
+          <div class="glass skill-cat reveal" style="transition-delay:0.25s">
+            <h3>Tools & Security</h3>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">VS Code / IDEs</span><span class="skill-pct">90%</span></div><div class="skill-track"><div class="skill-fill sf-cyan" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Git / GitHub</span><span class="skill-pct">70%</span></div><div class="skill-track"><div class="skill-fill sf-purple" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Network Security</span><span class="skill-pct">60%</span></div><div class="skill-track"><div class="skill-fill sf-green" style="width:0%"></div></div></div>
+            <div class="skill-bar"><div class="skill-info"><span class="skill-name">Linux / Terminal</span><span class="skill-pct">55%</span></div><div class="skill-track"><div class="skill-fill sf-amber" style="width:0%"></div></div></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" data-scene="contact" id="contact">
+      <div class="section-inner">
+        <span class="sec-label reveal">Contact</span>
+        <div class="glass contact-card reveal" style="transition-delay:0.1s">
+          <h2 class="gradient-text">Let's Build Something</h2>
+          <p>I'm looking for internship opportunities in software development. If you're hiring a passionate BCA student who ships code, let's talk.</p>
+          <div class="contact-links">
+            <a href="mailto:mayankdhingra671@gmail.com" class="clink"><span>✉</span> Email</a>
+            <a href="https://github.com/Silentbeastt" target="_blank" class="clink"><span>⌘</span> GitHub</a>
+            <a href="https://linkedin.com/in/mayank-dhingra-366583320" target="_blank" class="clink"><span>🔗</span> LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer><p>© 2026 Mayank Dhingra. Built with Three.js & passion.</p></footer>
+
+  </div>
+</div>
+
+<script type="importmap">
+{ "imports": { "three": "https://esm.sh/three@0.166.1/build/three.module.js" } }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+
+// ── Three.js Setup ──
+const canvas = document.getElementById('bg-canvas');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(55, window.innerWidth/window.innerHeight, 0.1, 100);
+camera.position.set(0, 0, 35);
+
+// ── Lights ──
+const ambientLight = new THREE.AmbientLight(0x111122, 0.8);
+scene.add(ambientLight);
+const pointLight = new THREE.PointLight(0x00e5ff, 2, 80);
+pointLight.position.set(10, 5, 10);
+scene.add(pointLight);
+const pointLight2 = new THREE.PointLight(0xa855f7, 2, 60);
+pointLight2.position.set(-10, -3, 5);
+scene.add(pointLight2);
+
+// ── Starfield ──
+const starsGeo = new THREE.BufferGeometry();
+const starCount = 2500;
+const starPos = new Float32Array(starCount * 3);
+for (let i = 0; i < starCount * 3; i += 3) {
+  starPos[i] = (Math.random() - 0.5) * 80;
+  starPos[i+1] = (Math.random() - 0.5) * 60;
+  starPos[i+2] = (Math.random() - 0.5) * 60;
+}
+starsGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+const starsMat = new THREE.PointsMaterial({ size: 0.04, color: 0x8888cc, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.6 });
+const stars = new THREE.Points(starsGeo, starsMat);
+scene.add(stars);
+
+// ── Particle Cloud ──
+const pCount = 2000;
+const pGeo = new THREE.BufferGeometry();
+const pPos = new Float32Array(pCount * 3);
+const pCol = new Float32Array(pCount * 3);
+for (let i = 0; i < pCount * 3; i += 3) {
+  pPos[i] = (Math.random() - 0.5) * 60;
+  pPos[i+1] = (Math.random() - 0.5) * 45;
+  pPos[i+2] = (Math.random() - 0.5) * 40;
+  const t = Math.random();
+  pCol[i] = 0 + t * 0.5;
+  pCol[i+1] = 0.4 + t * 0.5;
+  pCol[i+2] = 1 - t * 0.2;
+}
+pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+pGeo.setAttribute('color', new THREE.BufferAttribute(pCol, 3));
+const pMat = new THREE.PointsMaterial({ size: 0.09, vertexColors: true, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, opacity: 0.6 });
+const particles = new THREE.Points(pGeo, pMat);
+scene.add(particles);
+
+// ── Floating Wireframe Objects ──
+const objects = [];
+
+function mkObj(geo, color, opacity, pos, rotSpeed, floatAmp, floatSpd) {
+  const mat = new THREE.MeshBasicMaterial({ color, wireframe: true, transparent: true, opacity, depthWrite: false });
+  const m = new THREE.Mesh(geo, mat);
+  m.position.copy(pos);
+  scene.add(m);
+  const o = { mesh: m, rotSpeed, floatAmp, floatSpd, baseY: pos.y, baseX: pos.x, baseZ: pos.z };
+  objects.push(o);
+  return o;
+}
+
+const ico = mkObj(new THREE.IcosahedronGeometry(2.5, 1), 0x00e5ff, 0.12, new THREE.Vector3(-9, 3, -12), {x:0.003,y:0.004,z:0.002}, 1.0, 0.4);
+const torus = mkObj(new THREE.TorusGeometry(3, 0.4, 16, 80), 0xa855f7, 0.1, new THREE.Vector3(10, -3, -15), {x:0.005,y:0.002,z:0.003}, 0.8, 0.5);
+const octa = mkObj(new THREE.OctahedronGeometry(2, 0), 0x3b82f6, 0.14, new THREE.Vector3(5, 5, -18), {x:0.004,y:0.006,z:0.002}, 1.2, 0.35);
+const knot = mkObj(new THREE.TorusKnotGeometry(1.8, 0.3, 100, 16), 0x818cf8, 0.08, new THREE.Vector3(-7, -4, -10), {x:0.002,y:0.006,z:0.001}, 0.6, 0.55);
+const dod = mkObj(new THREE.DodecahedronGeometry(1.5, 0), 0x22c55e, 0.1, new THREE.Vector3(0, 7, -16), {x:0.005,y:0.003,z:0.005}, 0.9, 0.45);
+const ring = mkObj(new THREE.TorusGeometry(3.5, 0.12, 16, 120), 0xec4899, 0.07, new THREE.Vector3(3, -5, -20), {x:0.001,y:0.005,z:0.002}, 0.5, 0.6);
+
+// Grid
+const grid = new THREE.PolarGridHelper(35, 64, 30, 128, 0x00e5ff, 0x00e5ff);
+grid.position.z = -12;
+grid.material.opacity = 0.025;
+grid.material.transparent = true;
+scene.add(grid);
+
+// ── Smooth Scroll Engine ──
+const smoothContent = document.getElementById('smooth-content');
+const smoothWrapper = document.getElementById('smooth-wrapper');
+let targetScroll = 0;
+let currentScroll = 0;
+let scrollVelocity = 0;
+const ease = 0.075;
+
+function updateScrollHeight() {
+  const h = smoothWrapper.getBoundingClientRect().height;
+  smoothContent.style.height = h + 'px';
+}
+updateScrollHeight();
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  updateScrollHeight();
+});
+
+// Wheel handler
+window.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  targetScroll += e.deltaY;
+  targetScroll = Math.max(0, Math.min(targetScroll, smoothWrapper.scrollHeight - window.innerHeight));
+}, { passive: false });
+
+// Touch
+let touchStart = 0;
+window.addEventListener('touchstart', (e) => { touchStart = e.touches[0].clientY; }, { passive: true });
+window.addEventListener('touchmove', (e) => {
+  const dy = touchStart - e.touches[0].clientY;
+  touchStart = e.touches[0].clientY;
+  targetScroll += dy * 1.5;
+  targetScroll = Math.max(0, Math.min(targetScroll, smoothWrapper.scrollHeight - window.innerHeight));
+}, { passive: true });
+
+// Get section elements
+const sections = document.querySelectorAll('.section');
+const sectionData = [];
+sections.forEach((s, i) => {
+  sectionData.push({ el: s, scene: s.dataset.scene, index: i });
+});
+
+// ── Animation Loop ──
+const clock = new THREE.Clock();
+let totalScroll = 0;
+let sectionProgress = {};
+
+function getSectionProgress() {
+  const viewH = window.innerHeight;
+  sectionData.forEach((sd, i) => {
+    const rect = sd.el.getBoundingClientRect();
+    const top = rect.top;
+    const h = rect.height;
+    // progress: 0 = section top at viewport bottom, 1 = section bottom at viewport top
+    const start = viewH;
+    const end = -h;
+    const progress = 1 - (top - end) / (start - end);
+    sectionProgress[sd.scene || i] = Math.max(0, Math.min(1, progress));
+  });
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.1);
+  const elapsed = performance.now() * 0.001;
+
+  // Smooth scroll
+  currentScroll += (targetScroll - currentScroll) * ease;
+  smoothWrapper.style.transform = `translate3d(0, -${currentScroll}px, 0)`;
+
+  getSectionProgress();
+
+  const sp = sectionProgress.hero || 0;
+  const ap = sectionProgress.about || 0;
+  const pp = sectionProgress.projects || 0;
+  const skp = sectionProgress.skills || 0;
+  const cp = sectionProgress.contact || 0;
+
+  // ── Scene animation driven by scroll ──
+
+  // Camera: pull back as we scroll, with slight lateral shift
+  const camZ = 35 - sp * 8 - ap * 3 - pp * 6 - skp * 3 - cp * 4;
+  const camX = sp * 2 + ap * (-3) + pp * 1 + cp * (-1);
+  const camY = sp * (-1) + ap * 2 + pp * (-1) + skp * 1;
+  camera.position.x += (camX - camera.position.x) * 0.03;
+  camera.position.y += (camY - camera.position.y) * 0.03;
+  camera.position.z += (camZ - camera.position.z) * 0.03;
+  camera.lookAt(ap * 2 - 1, -ap * 1, -8 - pp * 4);
+
+  // Particles: spread out during hero, compress during about
+  particles.rotation.y += 0.00015;
+  particles.rotation.x += 0.00008;
+  particles.material.opacity = 0.6 - pp * 0.3;
+
+  // Stars slow rotation
+  stars.rotation.y += 0.00005;
+  stars.rotation.x += 0.00003;
+
+  // Animate each object with section influence
+  objects.forEach((o, i) => {
+    o.mesh.rotation.x += o.rotSpeed.x;
+    o.mesh.rotation.y += o.rotSpeed.y;
+    o.mesh.rotation.z += o.rotSpeed.z;
+
+    // Float
+    const floatY = Math.sin(elapsed * o.floatSpd) * o.floatAmp;
+    o.mesh.position.y = o.baseY + floatY;
+
+    // Section-specific transforms
+    if (ap > 0.1) {
+      // About section: objects orbit outward
+      const a = ap;
+      o.mesh.position.x += (o.baseX * (1 + a * 0.3) - o.mesh.position.x) * 0.02;
+      o.mesh.material.opacity += (0.08 - o.mesh.material.opacity) * 0.02;
+    }
+
+    if (pp > 0.1) {
+      // Projects: objects tighten and slow rotation
+      o.mesh.position.z += (o.baseZ * 0.7 - o.mesh.position.z) * 0.02;
+      o.mesh.rotation.y += 0.008 * pp;
+    }
+
+    if (skp > 0.1) {
+      // Skills: wireframes glow brighter
+      o.mesh.material.opacity += (0.18 - o.mesh.material.opacity) * 0.02;
+    }
+
+    if (cp > 0.1) {
+      // Contact: objects gather center
+      o.mesh.position.x += (0 - o.mesh.position.x) * 0.015;
+      o.mesh.position.z += (-20 - o.mesh.position.z) * 0.015;
+    }
+  });
+
+  // Grid pulse
+  grid.material.opacity = 0.025 + sp * 0.02;
+
+  renderer.render(scene, camera);
+}
+animate();
+
+// ── Reveal on scroll ──
+const revealObs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) e.target.classList.add('visible');
+  });
+}, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('.reveal').forEach(el => revealObs.observe(el));
+
+// ── Skill bar fill on scroll ──
+const skillObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.querySelectorAll('.skill-fill').forEach(fill => {
+        const targetW = fill.dataset.width || fill.style.width;
+        fill.style.width = '0%';
+        requestAnimationFrame(() => {
+          fill.style.transition = 'width 1.2s cubic-bezier(0.22,1,0.36,1)';
+          fill.style.width = targetW;
+        });
+      });
+      skillObs.unobserve(entry.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.skill-cat').forEach(c => skillObs.observe(c));
+// Set data-width for skill bars
+document.querySelectorAll('.skill-fill').forEach(f => { f.dataset.width = f.style.width; f.style.width = '0%'; });
+
+// ── Custom cursor ──
+const cursorEl = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursorDot');
+document.addEventListener('mousemove', (e) => {
+  cursorEl.style.left = (e.clientX - 8) + 'px';
+  cursorEl.style.top = (e.clientY - 8) + 'px';
+  cursorDot.style.left = (e.clientX - 2) + 'px';
+  cursorDot.style.top = (e.clientY - 2) + 'px';
+});
+document.querySelectorAll('a, button, .proj-card, .stat, .clink').forEach(el => {
+  el.addEventListener('mouseenter', () => cursorEl.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursorEl.classList.remove('hover'));
+});
+
+// ── Smooth scroll links ──
+document.querySelectorAll('[data-scroll-to]').forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const target = document.getElementById(link.dataset.scrollTo);
+    if (target) {
+      const rect = target.getBoundingClientRect();
+      targetScroll = currentScroll + rect.top;
+    }
+  });
+});
+
+// ── Mouse influence on 3D ──
+let mouseX = 0, mouseY = 0, targetMX = 0, targetMY = 0;
+window.addEventListener('mousemove', (e) => {
+  targetMX = (e.clientX / window.innerWidth) * 2 - 1;
+  targetMY = -(e.clientY / window.innerHeight) * 2 + 1;
+});
+// Update mouse in animate (add to animate function via a simple interval)
+setInterval(() => {
+  mouseX += (targetMX - mouseX) * 0.05;
+  mouseY += (targetMY - mouseY) * 0.05;
+  camera.position.x += mouseX * 0.3;
+  camera.position.y += mouseY * 0.2;
+}, 16);
+
+console.log('🚀 Mayank Dhingra Portfolio — Scroll-driven 3D ready');
+</script>
+
+</body>
+</html>
